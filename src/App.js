@@ -72,6 +72,7 @@ const App = () => {
       navigator.webkitGetUserMedia ||
       navigator.mozGetUserMedia;
     getUserMedia({ video: true, audio: true }, function (mediaStream) {
+      mediaStream.getAudioTracks()[0].enabled=false;
       currentUserVideoRef.current.srcObject = mediaStream;
       currentUserVideoRef.current.onloadedmetadata = function () {
         currentUserVideoRef.current.play();
@@ -79,9 +80,7 @@ const App = () => {
       const call = peerInstance.current.call(remotePeerId, mediaStream);
       setIsCallActive(true);
       call.on("stream", function (remoteStream) {
-        remoteStream.getAudioTracks().forEach(track => {
-          track.enabled = true; // Enable the audio track
-        });
+        remoteStream.getAudioTracks()[0].enabled=false;
 
         remoteVideoRef.current.srcObject = remoteStream;
         remoteVideoRef.current.onloadedmetadata = function () {

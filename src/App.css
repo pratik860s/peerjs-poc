@@ -5,81 +5,18 @@
   padding: 20px;
 }
 
-.videos{
-  padding: 25px;.App {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  .videos {
-    padding: 25px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap; /* Allow videos to wrap to the next line on smaller screens */
-    justify-content: center; /* Center videos horizontally */
-  }
-  
-  video {
-    width: 100%; /* Make videos take up full width of their container */
-    max-width: 320px; /* Limit maximum width of videos */
-    height: auto; /* Maintain aspect ratio */
-    margin: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  input[type="text"] {
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%; /* Make input fields take up full width */
-    box-sizing: border-box; /* Include padding and border in width calculation */
-  }
-  
-  button {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%; /* Make buttons take up full width */
-    box-sizing: border-box; /* Include padding and border in width calculation */
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  button:active {
-    background-color: #0056b3;
-  }
-  
-  button:focus {
-    outline: none;
-  }
-  
-  /* Media query for screens smaller than 768px (typical mobile devices) */
-  @media (max-width: 768px) {
-    .videos {
-      padding: 10px; /* Reduce padding around videos */
-    }
-  
-    video {
-      max-width: none; /* Remove maximum width on videos */
-    }
-  }
-  
+.videos {
+  padding: 25px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap; /* Allow videos to wrap to the next line on smaller screens */
+  justify-content: center; /* Center videos horizontally */
 }
 
 video {
-  width: 320px;
-  height: 240px;
+  width: 100%; /* Make videos take up full width of their container */
+  max-width: 320px; /* Limit maximum width of videos */
+  height: auto; /* Maintain aspect ratio */
   margin: 10px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -90,6 +27,8 @@ input[type="text"] {
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 100%; /* Make input fields take up full width */
+  box-sizing: border-box; /* Include padding and border in width calculation */
 }
 
 button {
@@ -99,6 +38,8 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  width: 100%; /* Make buttons take up full width */
+  box-sizing: border-box; /* Include padding and border in width calculation */
 }
 
 button:hover {
@@ -111,4 +52,15 @@ button:active {
 
 button:focus {
   outline: none;
+}
+
+/* Media query for screens smaller than 768px (typical mobile devices) */
+@media (max-width: 768px) {
+  .videos {
+    padding: 10px; /* Reduce padding around videos */
+  }
+
+  video {
+    max-width: none; /* Remove maximum width on videos */
+  }
 }
