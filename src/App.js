@@ -24,25 +24,25 @@ const App = () => {
         navigator.getUserMedia ||
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia;
-      getUserMedia({ video: true, audio: true }, function (mediaStream) {
-        // Mute the local audio track
-        mediaStream.getAudioTracks()[0].enabled = false; // Mute the audio track
-
-        currentUserVideoRef.current.srcObject = mediaStream;
-        currentUserVideoRef.current.onloadedmetadata = function () {
-          currentUserVideoRef.current.play();
-        };
-        setIsCallActive(true);
-        call.answer(mediaStream);
-        call.on("stream", function (remoteStream) {
-          remoteStream.getAudioTracks()[0].enabled = true; // Enable the audio track
-
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.onloadedmetadata = function () {
-            remoteVideoRef.current.play();
+      getUserMedia(
+        { video: true, audio: true },
+        function (mediaStream) {
+          currentUserVideoRef.current.srcObject = mediaStream;
+          console.log("MediaStreamLocal", mediaStream);
+          currentUserVideoRef.current.onloadedmetadata = function () {
+            currentUserVideoRef.current.play();
           };
-        });
-      });
+          call.answer(mediaStream);
+          call.on("stream", function (remoteStream) {
+            remoteVideoRef.current.srcObject = remoteStream;
+            remoteVideoRef.current.onloadedmetadata = function () {
+              remoteVideoRef.current.play();
+              setIsCallActive(true);
+            };
+            remoteVideoRef.current.muted = true;
+          });
+        }
+      );
     });
 
     // Clean up PeerJS instance on unmount
@@ -65,36 +65,41 @@ const App = () => {
       navigator.getUserMedia ||
       navigator.webkitGetUserMedia ||
       navigator.mozGetUserMedia;
-    getUserMedia({ video: true, audio: true }, function (mediaStream) {
-      mediaStream.getAudioTracks()[0].enabled=true;
-      currentUserVideoRef.current.srcObject = mediaStream;
-      currentUserVideoRef.current.onloadedmetadata = function () {
-        currentUserVideoRef.current.play();
-      };
-      const call = peerInstance.current.call(remotePeerId, mediaStream);
-      setIsCallActive(true);
-      call.on("stream", function (remoteStream) {
-        remoteStream.getAudioTracks()[0].enabled=true;
-
-        remoteVideoRef.current.srcObject = remoteStream;
-        remoteVideoRef.current.onloadedmetadata = function () {
-          remoteVideoRef.current.play();
+    getUserMedia(
+      { video: true, audio: true },
+      function (mediaStream) {
+        currentUserVideoRef.current.srcObject = mediaStream;
+        currentUserVideoRef.current.onloadedmetadata = function () {
+          currentUserVideoRef.current.play();
         };
-      });
-    });
+        const call = peerInstance.current.call(remotePeerId, mediaStream);
+        call.on("stream", function (remoteStream) {
+          remoteVideoRef.current.srcObject = remoteStream;
+          remoteVideoRef.current.onloadedmetadata = function () {
+            remoteVideoRef.current.play();
+            setIsCallActive(true);
+          };
+          currentUserVideoRef.current.muted = true;
+        });
+      }
+    );
   };
 
   const endCall = () => {
     setIsCallActive(false);
-    
+
     // Stop the video and audio tracks of the local stream
     const localStream = currentUserVideoRef.current.srcObject;
-    localStream.getTracks().forEach(track => {
+    localStream.getTracks().forEach((track) => {
       track.stop();
     });
-  
+
     currentUserVideoRef.current.srcObject = null;
     remoteVideoRef.current.srcObject = null;
+    currentUserVideoRef.current.muted = false;
+    remoteVideoRef.current.muted = false;
+
+
   };
 
   return (
