@@ -1,21 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import Peer from "peerjs";
 import "./App.css";
 
-const VideoCall = () => {
+const App = () => {
   const [peerId, setPeerId] = useState(null);
   const [remotePeerIdValue, setRemotePeerIdValue] = useState("");
   const remoteVideoRef = useRef(null);
   const peerInstance = useRef(null);
   const currentUserVideoRef = useRef(null);
   const [isCallActive, setIsCallActive] = useState(false);
-
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate("/");
-  };
 
   useEffect(() => {
     // Initialize PeerJS
@@ -27,26 +20,24 @@ const VideoCall = () => {
     });
     peerInstance.current.on("call", (call) => {
       // Answer incoming call
-      var getUserMedia =
-        navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia;
-      getUserMedia({ video: true, audio: true }, function (mediaStream) {
-        currentUserVideoRef.current.srcObject = mediaStream;
-        console.log("MediaStreamLocal", mediaStream);
-        currentUserVideoRef.current.onloadedmetadata = function () {
-          currentUserVideoRef.current.play();
-        };
-        call.answer(mediaStream);
-        call.on("stream", function (remoteStream) {
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.onloadedmetadata = function () {
-            remoteVideoRef.current.play();
-            setIsCallActive(true);
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(mediaStream => {
+          currentUserVideoRef.current.srcObject = mediaStream;
+          currentUserVideoRef.current.onloadedmetadata = () => {
+            currentUserVideoRef.current.play();
           };
-          remoteVideoRef.current.muted = true;
+          setIsCallActive(true);
+          call.answer(mediaStream);
+          call.on("stream", remoteStream => {
+            remoteVideoRef.current.srcObject = remoteStream;
+            remoteVideoRef.current.onloadedmetadata = () => {
+              remoteVideoRef.current.play();
+            };
+          });
+        })
+        .catch(error => {
+          console.error("Error accessing media devices:", error);
         });
-      });
     });
 
     // Clean up PeerJS instance on unmount
@@ -65,25 +56,24 @@ const VideoCall = () => {
     }
 
     // Start call
-    var getUserMedia =
-      navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia;
-    getUserMedia({ video: true, audio: true }, function (mediaStream) {
-      currentUserVideoRef.current.srcObject = mediaStream;
-      currentUserVideoRef.current.onloadedmetadata = function () {
-        currentUserVideoRef.current.play();
-      };
-      const call = peerInstance.current.call(remotePeerId, mediaStream);
-      call.on("stream", function (remoteStream) {
-        remoteVideoRef.current.srcObject = remoteStream;
-        remoteVideoRef.current.onloadedmetadata = function () {
-          remoteVideoRef.current.play();
-          setIsCallActive(true);
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(mediaStream => {
+        currentUserVideoRef.current.srcObject = mediaStream;
+        currentUserVideoRef.current.onloadedmetadata = () => {
+          currentUserVideoRef.current.play();
         };
-        currentUserVideoRef.current.muted = true;
+        const call = peerInstance.current.call(remotePeerId, mediaStream);
+        setIsCallActive(true);
+        call.on("stream", remoteStream => {
+          remoteVideoRef.current.srcObject = remoteStream;
+          remoteVideoRef.current.onloadedmetadata = () => {
+            remoteVideoRef.current.play();
+          };
+        });
+      })
+      .catch(error => {
+        console.error("Error accessing media devices:", error);
       });
-    });
   };
 
   const endCall = () => {
@@ -91,19 +81,16 @@ const VideoCall = () => {
 
     // Stop the video and audio tracks of the local stream
     const localStream = currentUserVideoRef.current.srcObject;
-    localStream.getTracks().forEach((track) => {
+    localStream.getTracks().forEach(track => {
       track.stop();
     });
 
     currentUserVideoRef.current.srcObject = null;
     remoteVideoRef.current.srcObject = null;
-    currentUserVideoRef.current.muted = false;
-    remoteVideoRef.current.muted = false;
   };
 
   return (
     <div className="App">
-      <button onClick={handleBack}>Back</button>
       <p>Peer Id Is: {peerId}</p>
       <input
         type="text"
@@ -120,11 +107,11 @@ const VideoCall = () => {
           <video ref={currentUserVideoRef} />
         </div>
         <div>
-          <video ref={remoteVideoRef} />
+          <video ref={remoteVideoRef}/>
         </div>
       </div>
     </div>
   );
 };
 
-export default VideoCall;
+export default App;
