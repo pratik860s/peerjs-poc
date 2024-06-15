@@ -14,7 +14,7 @@ const App = () => {
     // Initialize PeerJS
     peerInstance.current = new Peer({
       host: "peer.harshjmhr.xyz",
-      port: 9000,
+      // port: 9000,
       path: "/myapp",
     });
 
