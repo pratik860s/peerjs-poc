@@ -14,16 +14,17 @@ const App = () => {
     // Initialize PeerJS
     peerInstance.current = new Peer({
       host: "peer.harshjmhr.xyz",
-      // port: 9000,
       path: "/myapp",
     });
 
     // Set up event listeners
     peerInstance.current.on("open", function (id) {
       setPeerId(id);
+      console.log("My peer ID is: " + id);
     });
+
     peerInstance.current.on("call", (call) => {
-      // Answer incoming call
+      console.log("Receiving a call");
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((mediaStream) => {
@@ -35,6 +36,7 @@ const App = () => {
           setIsCallActive(true);
           call.answer(mediaStream);
           call.on("stream", (remoteStream) => {
+            console.log("Receiving remote stream");
             remoteVideoRef.current.srcObject = remoteStream;
             remoteVideoRef.current.onloadedmetadata = () => {
               remoteVideoRef.current.play();
@@ -72,6 +74,7 @@ const App = () => {
         const call = peerInstance.current.call(remotePeerId, mediaStream);
         setIsCallActive(true);
         call.on("stream", (remoteStream) => {
+          console.log("Receiving remote stream during call");
           remoteVideoRef.current.srcObject = remoteStream;
           remoteVideoRef.current.onloadedmetadata = () => {
             remoteVideoRef.current.play();
@@ -88,9 +91,11 @@ const App = () => {
 
     // Stop the video and audio tracks of the local stream
     const localStream = currentUserVideoRef.current.srcObject;
-    localStream.getTracks().forEach((track) => {
-      track.stop();
-    });
+    if (localStream) {
+      localStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
 
     currentUserVideoRef.current.srcObject = null;
     remoteVideoRef.current.srcObject = null;
