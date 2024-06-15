@@ -12,7 +12,11 @@ const App = () => {
 
   useEffect(() => {
     // Initialize PeerJS
-    peerInstance.current = new Peer();
+    peerInstance.current = new Peer({
+      host: "peer.harshjmhr.xyz",
+      port: 9000,
+      path: "/myapp",
+    });
 
     // Set up event listeners
     peerInstance.current.on("open", function (id) {
@@ -20,22 +24,24 @@ const App = () => {
     });
     peerInstance.current.on("call", (call) => {
       // Answer incoming call
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(mediaStream => {
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((mediaStream) => {
           currentUserVideoRef.current.srcObject = mediaStream;
+          currentUserVideoRef.current.muted = true;
           currentUserVideoRef.current.onloadedmetadata = () => {
             currentUserVideoRef.current.play();
           };
           setIsCallActive(true);
           call.answer(mediaStream);
-          call.on("stream", remoteStream => {
+          call.on("stream", (remoteStream) => {
             remoteVideoRef.current.srcObject = remoteStream;
             remoteVideoRef.current.onloadedmetadata = () => {
               remoteVideoRef.current.play();
             };
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error accessing media devices:", error);
         });
     });
@@ -56,22 +62,23 @@ const App = () => {
     }
 
     // Start call
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(mediaStream => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((mediaStream) => {
         currentUserVideoRef.current.srcObject = mediaStream;
         currentUserVideoRef.current.onloadedmetadata = () => {
           currentUserVideoRef.current.play();
         };
         const call = peerInstance.current.call(remotePeerId, mediaStream);
         setIsCallActive(true);
-        call.on("stream", remoteStream => {
+        call.on("stream", (remoteStream) => {
           remoteVideoRef.current.srcObject = remoteStream;
           remoteVideoRef.current.onloadedmetadata = () => {
             remoteVideoRef.current.play();
           };
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error accessing media devices:", error);
       });
   };
@@ -81,7 +88,7 @@ const App = () => {
 
     // Stop the video and audio tracks of the local stream
     const localStream = currentUserVideoRef.current.srcObject;
-    localStream.getTracks().forEach(track => {
+    localStream.getTracks().forEach((track) => {
       track.stop();
     });
 
@@ -107,7 +114,7 @@ const App = () => {
           <video ref={currentUserVideoRef} />
         </div>
         <div>
-          <video ref={remoteVideoRef}/>
+          <video ref={remoteVideoRef} />
         </div>
       </div>
     </div>
